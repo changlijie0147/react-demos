@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="build/react.js"></script>
+    <script src="build/react-dom.js"></script>
+    <script src="build/browser.min.js"></script>
+    <style>
+        * {
+            padding:0;
+            margin: 0;
+        }
+        #container {
+            width:500px;
+            margin: 100px 0 0 100px;
+            border: 1px solid #ccc;
+        }
+        #input {
+            width:95%;
+            height:50px;
+            border:1px solid #aaa;
+            background-color: #fff;
+            line-height: 50px;
+            font-size: 20px;
+            padding-left:5%;
+        }
+        #ul {
+            list-style: none;
+        }
+        #ul li {
+            padding-left:5%;
+            width:95%;
+            height:50px;
+            font-size: 20px;
+            border:1px solid #ccc;
+            line-height: 50px;
+        }
+        #ul li input {
+            width:20px;
+            height:20px;
+            margin-right:20px;
+        }
+        #ul li button {
+            width:40px;
+            height:20px;
+            float: right;
+            margin: 15px 20px 0 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container"></div>
+    <script type="text/babel">
+        var TodoList = React.createClass({
+            getInitialState: function () {
+              return {
+                  todolist:['吃饭','睡觉','打豆']
+              }
+            },
+            handleChange: function (rows) {
+                this.setState({
+                    todolist: rows
+                });
+            },
+            render: function () {
+                return (
+                        <div>
+                            <Input onAdd={this.handleChange} todo={this.state.todolist}/>
+                            <UlList onDel={this.handleChange} todo={this.state.todolist}/>
+                        </div>
+                );
+            }
+        });
+        var Input = React.createClass({
+            handleAdd: function (e) {
+                e.preventDefault();
+                var input = this.refs.input;
+                var val = input.value;
+                var rows = this.props.todo;
+                if(val !==''){
+                    rows.push(val);
+                    this.props.onAdd(rows);
+                }
+                input.value = '';
+            },
+            render: function () {
+                console.log(this);
+                return (
+                  <form onSubmit={this.handleAdd}>
+                      <input ref="input" id="input" placeholder="what are you doing?"></input>
+                  </form>
+                );
+            }
+        });
+        var UlList = React.createClass({
+            handleDel: function (e) {
+              e.preventDefault(e);
+                var delIndex = e.target.getAttribute('data-key');
+                console.log(delIndex);
+                // 更新数据，并使用 onDel 更新到 TodoList 的 state 中，以便 React自动render
+                this.props.todo.splice(delIndex, 1);
+                this.props.onDel(this.props.todo)
+            },
+            render: function () {
+                return (
+                        <ul id="ul">
+                            {
+                                this.props.todo.map(function (item,i) {
+                                    return (
+                                            <li key={i}>
+                                                <input type="checkbox" />
+                                                {item}
+                                                <button onClick={this.handleDel} data-key={i}>删除</button>
+                                            </li>
+                                    )
+                                }.bind(this))
+                            }
+                        </ul>
+                );
+            }
+        });
+        ReactDOM.render(
+                <TodoList/>,
+                document.getElementById('container')
+        );
+    </script>
+</body>
+
+</html>
